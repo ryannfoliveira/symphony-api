@@ -26,7 +26,7 @@ def list_products(db: Session = Depends(get_db)):
     products = db.query(models.Produto).all()
 
     if not products:
-        raise HTTPException(status_code=200, detail="Não há produtos")
+        return {"detail": "Não há produtos"}
 
     return products
 
