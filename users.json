@@ -1,0 +1,7 @@
+[
+    {"nome": "João Silva", "email": "joao.silva@example.com", "senha": "senha123", "cargo": "cliente"},
+    {"nome": "Maria Oliveira", "email": "maria.oliveira@example.com", "senha": "senha456", "cargo": "cliente"},
+    {"nome": "Carlos Santos", "email": "carlos.santos@example.com", "senha": "senha789", "cargo": "cliente"},
+    {"nome": "Doralice Costa", "email": "doralice.costa@symphony.com", "senha": "senha_extremamente_forte", "cargo": "funcionario"},
+    {"nome": "Eduardo Lima", "email": "eduardo.lima@symphony.com", "senha": "senha_impossivel_de_adivinhar", "cargo": "admin"}
+]

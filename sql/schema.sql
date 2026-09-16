@@ -24,7 +24,7 @@ CREATE TABLE usuarios (
     nome VARCHAR(255),
     email VARCHAR(255) UNIQUE,
     senha VARCHAR(255),
-    cargo VARCHAR(255) CHECK (cargo IN ('admin', 'funcionario', 'visitante'))
+    cargo VARCHAR(255) CHECK (cargo IN ('admin', 'funcionario', 'cliente'))
 );
 
 CREATE TABLE pedidos (

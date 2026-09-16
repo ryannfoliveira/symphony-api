@@ -20,7 +20,7 @@ class Usuario(Base):
     nome = Column(String)
     email = Column(String, unique=True, index=True)
     senha = Column(String)
-    cargo = Column(String)  # São eles: visitante, funcionário e administrador ( escrito "admin")
+    cargo = Column(String)  # São eles: cliente, funcionário e administrador ( escrito "admin")
 
 class Pedidos(Base):
     __tablename__ = 'pedidos'

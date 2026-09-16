@@ -14,7 +14,7 @@ def alive():
 
 
 # Requisito Funcional: É preciso haver autenticação
-@app.get('/login')
+@app.post('/login')
 def login():
     raise HTTPException(status_code=501, detail="Autenticação ainda não implementada")
 
