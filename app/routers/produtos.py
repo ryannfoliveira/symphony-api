@@ -12,7 +12,8 @@ def produto_create(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)
     db_produto = models.Produto(
         nome = produto.nome,
         preco = produto.preco,
-        estoque = produto.estoque
+        estoque = produto.estoque,
+        categoria_id = produto.categoria_id
     )
     db.add(db_produto)
     db.commit()
@@ -23,12 +24,12 @@ def produto_create(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)
 # Requisito Funcional 2: Listar os instrumentos musicais
 @router.get('/{product_id}')
 def produto_read(product_id: int, db: Session = Depends(get_db)):
-    products = [db.query(models.Produto).filter(models.Produto.id == product_id).first()]
+    product = db.query(models.Produto).filter(models.Produto.id == product_id).first()
 
-    if not products:
-        return {"detail": "Não há nenhum produto com o id especificado."}
+    if not product:
+        raise HTTPException(status_code=404, detail="Produto não encontrado.")
 
-    return products
+    return product
 
 @router.get('/')
 def produto_list(db: Session = Depends(get_db)):

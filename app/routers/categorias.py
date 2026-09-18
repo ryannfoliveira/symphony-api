@@ -17,12 +17,12 @@ def add_categoria(categoria: schemas.CategoriaCreate, db: Session = Depends(get_
 
 @router.get('/{categoria_id}')
 def categoria_read(categoria_id: int, db: Session = Depends(get_db)):
-    categorias = [db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()]
+    categoria = db.query(models.Categoria).filter(models.Categoria.id == categoria_id).first()
 
-    if not categorias:
-        return {"detail": "Não há nenhuma categoria com o id especificado."}
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Não há nenhuma categoria com o id especificado.")
 
-    return categorias
+    return categoria
 
 @router.get('/')
 def categoria_list(db: Session = Depends(get_db)):

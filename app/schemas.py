@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 class Produto(BaseModel):
     nome: str
     preco: float = Field(gt=0)
     estoque: int = Field(gt=0)
+    categoria_id: int
 
 # Está igual à base, mas é uma classe separada por
 # propósitos de manutenibilidade e escalabilidade
@@ -18,9 +19,10 @@ class ProdutoRead(Produto):
         from_attributes = True
 
 class ProdutoUpdate(BaseModel):
-    nome: Optional[str]
+    nome: str | None
     preco: Optional[float] = Field(None, gt=0)
     estoque: Optional[int] = Field(None, gt=0)
+    categoria_id: int | None
 
 ### CATEGORIAS ###
 class Categoria(BaseModel):
@@ -61,6 +63,10 @@ class UsuarioUpdate(BaseModel):
     cargo: Optional[str]
 
 ### PEDIDOS ###
-class Pedido(BaseModel):
+class ItemPedidoCreate(BaseModel):
+    produto_id: int
+    quantidade: int = Field(gt=0)
+
+class PedidoCreate(BaseModel):
     usuario_id: int
-    data: str
+    produtos: List[ItemPedidoCreate]

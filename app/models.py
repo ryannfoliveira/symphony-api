@@ -25,7 +25,7 @@ class Usuario(Base):
 class Pedidos(Base):
     __tablename__ = 'pedidos'
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    cliente_id = Column(Integer, ForeignKey('usuarios.id'))
     data = Column(String)
 
 class ItensPedidos(Base):
@@ -34,3 +34,4 @@ class ItensPedidos(Base):
     pedido_id = Column(Integer, ForeignKey('pedidos.id'))
     produto_id = Column(Integer, ForeignKey('produtos.id'))
     quantidade = Column(Integer)
+    preco_unitario = Column(Float)

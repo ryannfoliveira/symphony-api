@@ -1,12 +1,10 @@
 from sqlalchemy import text
-from passlib.context import CryptContext
 from app.database import engine, db_path
 import os
 import json
+import bcrypt
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def init_db(path: str):
     '''
@@ -38,8 +36,9 @@ def insert_users(path: str):
         # pois aquela sintaxe de "VALUES (?, ?, [...])" não é entendida por todos eles
         query = text("INSERT INTO usuarios (nome, email, senha, cargo) VALUES (:nome, :email, :senha, :cargo)")
 
-        for usuario in usuarios:
-            usuario['senha'] = pwd_context.hash(usuario['senha'])
+        for i, usuario in enumerate(usuarios):
+            print(f"Inserindo usuário {i + 1}/{len(usuarios)}")
+            usuario['senha'] = bcrypt.hashpw(usuario['senha'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             conn.execute(query, usuario)
 
 
@@ -57,6 +56,7 @@ def main():
     print("Inserindo usuários fictícios...")
     insert_users(users_path)
 
+    print("Banco de dados inicializado com sucesso!")
 
 if __name__ == '__main__':
     main()

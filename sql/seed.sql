@@ -33,7 +33,7 @@ INSERT INTO produtos (categoria_id, nome, preco, estoque) VALUES
 (1, 'Reco-reco', 80.00, 12),
 (1, 'Chocalho', 50.00, 20),
 (1, 'Gongo', 400.00, 3),
-(1, 'Tímpano', 600.00, 2);
+(1, 'Tímpano', 600.00, 2),
 (3, 'Mesa de Som 12 canais', 1500.00, 5),
 (3, 'Amplificador Valvulado', 4000.00, 3),
 (2, 'Pedal de Distortion', 450.00, 10),
