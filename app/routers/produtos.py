@@ -7,8 +7,8 @@ from app.database import get_db
 router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
 # Requisito Funcional 1: Cadastrar produtos em estoque
-@router.post('/products')
-def add_product(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
+@router.post('/')
+def produto_create(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
     db_produto = models.Produto(
         nome = produto.nome,
         preco = produto.preco,
@@ -21,8 +21,17 @@ def add_product(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
     return db_produto
 
 # Requisito Funcional 2: Listar os instrumentos musicais
-@router.get('/products')
-def list_products(db: Session = Depends(get_db)):
+@router.get('/{product_id}')
+def produto_read(product_id: int, db: Session = Depends(get_db)):
+    products = [db.query(models.Produto).filter(models.Produto.id == product_id).first()]
+
+    if not products:
+        return {"detail": "Não há nenhum produto com o id especificado."}
+
+    return products
+
+@router.get('/')
+def produto_list(db: Session = Depends(get_db)):
     products = db.query(models.Produto).all()
 
     if not products:
@@ -31,8 +40,8 @@ def list_products(db: Session = Depends(get_db)):
     return products
 
 # Requisito Funcional 3: Atualizar quantidade em estoque
-@router.put('/products/{product_id}')
-def update_entry(product_id: int, new_info: schemas.ProdutoUpdate, db: Session = Depends(get_db)):
+@router.put('/{product_id}')
+def produto_update(product_id: int, new_info: schemas.ProdutoUpdate, db: Session = Depends(get_db)):
     product = db.query(models.Produto).filter(models.Produto.id == product_id).first()
 
     update = new_info.model_dump(exclude_unset=True)
@@ -46,8 +55,8 @@ def update_entry(product_id: int, new_info: schemas.ProdutoUpdate, db: Session =
     return product
 
 # Requisito Funcional 4: Deletar produtos cuja venda será descontinuada
-@router.delete('/products/{product_id}')
-def delete_product(product_id: int, db: Session = Depends(get_db)):
+@router.delete('/{product_id}')
+def produto_delete(product_id: int, db: Session = Depends(get_db)):
     # Encontra o produto
     product = db.query(models.Produto).filter(models.Produto.id == product_id).first()
 
@@ -59,7 +68,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
         
     return {'message': f'Produto {product_id} removido com sucesso'}
 
-@router.delete('/reset-products')
+@router.delete('/reset')
 def reset_products(db: Session = Depends(get_db)):
     # O equivalente ao TRUNCATE ou DELETE FROM products;
     db.query(models.Produto).delete()

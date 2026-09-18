@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 import app.models as models
 from app.database import engine, SessionLocal
-from app.routers import produtos, clientes
+from app.routers import produtos, categorias
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -20,3 +20,4 @@ def login():
 
 ### ROTEADROES ###
 app.include_router(produtos.router)
+app.include_router(categorias.router)
