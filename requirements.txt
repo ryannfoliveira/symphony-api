@@ -6,3 +6,4 @@ rich
 uvicorn
 sqlalchemy
 bcrypt
+PyJWT

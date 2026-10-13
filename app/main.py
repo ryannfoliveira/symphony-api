@@ -6,7 +6,7 @@ from fastapi import FastAPI, Depends, HTTPException
 
 import app.models as models
 from app.schemas import UsuarioLogin
-from app.database import engine, SessionLocal
+from app.database import engine, get_db
 from app.routers import produtos, categorias, pedidos
 
 models.Base.metadata.create_all(bind=engine)
@@ -38,7 +38,7 @@ def alive():
 
 # Requisito Funcional: É preciso haver autenticação
 @app.post('/login')
-def login(payload: UsuarioLogin, db: Session = Depends(SessionLocal)):
+def login(payload: UsuarioLogin, db: Session = Depends(get_db)):
     # Descobrir de que usuário estamos falando (ou se nem existe)
     usuario = db.query(models.Usuario).filter(models.Usuario.email == payload.email).first()
 
