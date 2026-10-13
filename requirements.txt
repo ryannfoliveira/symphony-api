@@ -5,4 +5,4 @@ python-dotenv
 rich
 uvicorn
 sqlalchemy
-passlib[bcrypt]
+bcrypt

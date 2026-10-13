@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 
 class Produto(BaseModel):
@@ -43,7 +43,7 @@ class CategoriaUpdate(BaseModel):
 ### USUÁRIOS ###
 class Usuario(BaseModel):
     nome: str
-    email: str
+    email: EmailStr
     senha: str
     cargo: str
 
@@ -61,6 +61,11 @@ class UsuarioUpdate(BaseModel):
     email: Optional[str]
     senha: Optional[str]
     cargo: Optional[str]
+
+## AUTENTICAÇÃO
+class UsuarioLogin(BaseModel):
+    email: EmailStr
+    senha: str
 
 ### PEDIDOS ###
 class ItemPedidoCreate(BaseModel):

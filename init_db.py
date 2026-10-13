@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from app.database import engine, db_path
+from app.database import engine
 import os
 import json
 import bcrypt
