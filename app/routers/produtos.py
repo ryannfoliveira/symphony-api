@@ -3,12 +3,19 @@ from sqlalchemy.orm import Session
 import app.models as models
 import app.schemas as schemas
 from app.database import get_db
+from app.routers.auth import verificar_token_jwt
 
 router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
 # Requisito Funcional 1: Cadastrar produtos em estoque
 @router.post('/')
-def produto_create(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
+def produto_create(produto: schemas.ProdutoCreate,
+                   db: Session = Depends(get_db),
+                   usuario_atual: dict = Depends(verificar_token_jwt)):
+
+    if usuario_atual['cargo'] not in ['admin', 'funcionario']:
+        raise HTTPException(status_code=403, detail="Você não possui permissão para criar produtos.")
+    
     db_produto = models.Produto(
         nome = produto.nome,
         preco = produto.preco,
@@ -40,9 +47,15 @@ def produto_list(db: Session = Depends(get_db)):
 
     return products
 
-# Requisito Funcional 3: Atualizar quantidade em estoque
+# Requisito Funcional 3: Atualizar dados do produto
 @router.put('/{product_id}')
-def produto_update(product_id: int, new_info: schemas.ProdutoUpdate, db: Session = Depends(get_db)):
+def produto_update(product_id: int, new_info: schemas.ProdutoUpdate,
+                   db: Session = Depends(get_db),
+                   usuario_atual: dict = Depends(verificar_token_jwt)):
+
+    if usuario_atual['cargo'] not in ['admin', 'funcionario']:
+        raise HTTPException(status_code=403, detail="Você não possui permissão para resetar os produtos.")
+
     product = db.query(models.Produto).filter(models.Produto.id == product_id).first()
 
     update = new_info.model_dump(exclude_unset=True)
@@ -57,7 +70,12 @@ def produto_update(product_id: int, new_info: schemas.ProdutoUpdate, db: Session
 
 # Requisito Funcional 4: Deletar produtos cuja venda será descontinuada
 @router.delete('/{product_id}')
-def produto_delete(product_id: int, db: Session = Depends(get_db)):
+def produto_delete(product_id: int, db: Session = Depends(get_db),
+                   usuario_atual: dict = Depends(verificar_token_jwt) ):
+
+    if usuario_atual['cargo'] not in ['admin', 'funcionario']:
+        raise HTTPException(status_code=403, detail="Você não possui permissão para resetar os produtos.")
+
     # Encontra o produto
     product = db.query(models.Produto).filter(models.Produto.id == product_id).first()
 
@@ -70,7 +88,12 @@ def produto_delete(product_id: int, db: Session = Depends(get_db)):
     return {'message': f'Produto {product_id} removido com sucesso'}
 
 @router.delete('/reset')
-def reset_products(db: Session = Depends(get_db)):
+def reset_products(db: Session = Depends(get_db),
+                   usuario_atual: dict = Depends(verificar_token_jwt)):
+    
+    if usuario_atual['cargo'] not in ['admin', 'funcionario']:
+        raise HTTPException(status_code=403, detail="Você não possui permissão para resetar os produtos.")
+    
     # O equivalente ao TRUNCATE ou DELETE FROM products;
     db.query(models.Produto).delete()
     db.commit()

@@ -68,10 +68,10 @@ class UsuarioLogin(BaseModel):
     senha: str
 
 ### PEDIDOS ###
-class ItemPedidoCreate(BaseModel):
+class ItemPedido(BaseModel):
     produto_id: int
     quantidade: int = Field(gt=0)
 
 class PedidoCreate(BaseModel):
     usuario_id: int
-    produtos: List[ItemPedidoCreate]
+    produtos: List[ItemPedido]
