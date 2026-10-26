@@ -16,6 +16,7 @@ CREATE TABLE produtos (
     nome VARCHAR(255),
     preco DECIMAL(10,2) NOT NULL CHECK (preco >= 0),
     estoque INTEGER NOT NULL CHECK (estoque >= 0)
+    -- Letra I do CIA: Por mais que a API já barre comprar produto sem estoque, o próprio banco de dados também deve ter trava
 );
 
 -- Tabela única de pessoas
@@ -30,7 +31,8 @@ CREATE TABLE usuarios (
 CREATE TABLE pedidos (
     id INTEGER PRIMARY KEY,
     cliente_id INTEGER NOT NULL REFERENCES usuarios(id),
-    data DATE DEFAULT CURRENT_DATE
+    data DATE DEFAULT CURRENT_DATE,
+    status VARCHAR(255) DEFAULT 'pendente' CHECK (status IN ('pendente', 'concluido', 'cancelado'))
 );
 
 CREATE TABLE itens_pedidos (
@@ -39,7 +41,7 @@ CREATE TABLE itens_pedidos (
     produto_id INTEGER NOT NULL REFERENCES produtos(id),
     quantidade INTEGER NOT NULL CHECK (quantidade > 0),
     preco_unitario DECIMAL(10,2) NOT NULL CHECK (preco_unitario >= 0)
-    -- Essa é uma técnica de desnormalização proposital. Aprendi esse termo faz um tempinho
+    -- Essa é uma técnica de desnormalização proposital.
     -- Nessa coluna se salva o preço no momento da compra, já que produtos(preco) é mutável,
     --o que garante reconstrução fidedigna do histórico
 );

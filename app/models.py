@@ -22,11 +22,12 @@ class Usuario(Base):
     senha = Column(String)
     cargo = Column(String)  # São eles: cliente, funcionário e administrador ( escrito "admin")
 
-class Pedidos(Base):
+class Pedido(Base):
     __tablename__ = 'pedidos'
     id = Column(Integer, primary_key=True, index=True)
     cliente_id = Column(Integer, ForeignKey('usuarios.id'))
     data = Column(String)
+    status = Column(String, default="pendente")
 
 class ItensPedidos(Base):
     __tablename__ = 'itens_pedidos'
