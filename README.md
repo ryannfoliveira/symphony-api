@@ -66,13 +66,13 @@ python -m venv .venv
 
 ### 2. Ativar o ambiente virtual
 
-Linux:
+**Linux/macOS:**
 
 ```bash
 source .venv/bin/activate
 ```
 
-Windows:
+**Windows:**
 
 ```bash
 .venv\Scripts\activate
@@ -87,14 +87,15 @@ pip install -r requirements.txt
 ### 4. Inicializar o banco de dados
 
 ```bash
-python init_db.py
+python3 init_db.py
 ```
+(ou só python, se o seu retornar comando não existente)
 
 Esse comando executa o arquivo schema.sql, insere os dados de exemplo de seed.sql e cria os usuários definidos em users.json.
 
-O banco SQLite é criado em database.db.
+O banco SQLite é criado em data/database.db.
 
-> O script de inicialização não foi projetado para ser executado várias vezes sobre o mesmo banco, pois tentará recriar dados e poderá produzir erros de registros duplicados.
+> O script de inicialização não foi projetado para ser executado várias vezes sobre o mesmo banco, pois tentará recriar dados e produzirá todo tipo de erro indesejado.
 
 ## Executar a API
 
