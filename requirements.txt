@@ -1,9 +1,6 @@
 fastapi[standard]
 Jinja2
-pydantic
-python-dotenv
-rich
-uvicorn
-sqlalchemy
-bcrypt
-PyJWT
+pydantic==2.13.5
+sqlalchemy==2.0.52
+bcrypt==5.0.0
+PyJWT==2.15.1

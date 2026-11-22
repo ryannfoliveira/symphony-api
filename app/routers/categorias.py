@@ -81,7 +81,7 @@ def categoria_delete(categoria_id: int,
     return {"detail": "Categoria deletada com sucesso."}
 
 @router.delete('/reset')
-def reset_products(db: Session = Depends(get_db),
+def categoria_reset(db: Session = Depends(get_db),
                    usuario_atual: dict = Depends(verificar_token_jwt)):
     
     if usuario_atual['cargo'] not in ['admin', 'funcionario']:

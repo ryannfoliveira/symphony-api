@@ -10,15 +10,10 @@ from app.routers.auth import verificar_token_jwt
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 @router.post('/', status_code=201)
-def criar_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db), usuario_atual: dict = Depends(verificar_token_jwt)):
+def pedido_create(pedido: schemas.PedidoCreate, db: Session = Depends(get_db), usuario_atual: dict = Depends(verificar_token_jwt)):
 
     if not pedido.produtos:
         raise HTTPException(status_code=400, detail="O pedido deve conter ao menos um produto.")
-
-    id_atual = db.query(models.Usuario).filter(models.Usuario.email == usuario_atual['email']).first().id
-
-    if pedido.usuario_id != id_atual and usuario_atual['cargo'] not in ['admin', 'funcionario']:
-        raise HTTPException(status_code=403, detail="Você não tem permissão para criar pedidos para outros usuários.")
     
     # A lista dos itens, como vieram na requisição, para poder fazer checagens
     itens: Dict[int, int] = {} # {id: quantidade}
@@ -38,15 +33,13 @@ def criar_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db), us
         if produto < quantidade:
             raise HTTPException(status_code=400, detail=f"Estoque insuficiente para o produto {produto.nome}. Pedimos desculpas pelo transtorno.")
 
+    id_atual = db.query(models.Usuario).filter(models.Usuario.email == usuario_atual['email']).first().id
+
     try:
-        db_pedido = models.Pedido(cliente_id=pedido.usuario_id, data=datetime.now().isoformat())
+        db_pedido = models.Pedido(cliente_id=id_atual, data=datetime.now().isoformat())
         db.add(db_pedido)
         db.flush()
 
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=e.args[0] if e.args else "Erro ao criar o pedido.")
-    else:
         for item in pedido.produtos:
             db_item = models.ItensPedidos(
                 pedido_id=db_pedido.id,
@@ -58,7 +51,12 @@ def criar_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db), us
             # Atualizando o estoque do produto
             produto = db.query(models.Produto).filter(models.Produto.id == item.produto_id).first()
             produto.estoque -= item.quantidade
+            db.refresh(produto)
 
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=e.args[0] if e.args else "Erro ao criar o pedido.")
+    else:
         db.commit()
         db.refresh(db_pedido)
         db.refresh(db_item)
@@ -66,7 +64,7 @@ def criar_pedido(pedido: schemas.PedidoCreate, db: Session = Depends(get_db), us
         return db_pedido
 
 @router.get('/{pedido_id}')
-def ler_pedido(pedido_id: int, db: Session = Depends(get_db), usuario_atual: dict = Depends(verificar_token_jwt)):
+def pedido_read(pedido_id: int, db: Session = Depends(get_db), usuario_atual: dict = Depends(verificar_token_jwt)):
     pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
 
     id_atual = db.query(models.Usuario).filter(models.Usuario.email == usuario_atual['email']).first().id
@@ -95,3 +93,33 @@ def ler_pedido(pedido_id: int, db: Session = Depends(get_db), usuario_atual: dic
         "status": pedido.status,
         "produtos": produtos
     }
+
+# Uma rota produto_list seria sem sentido
+
+@router.put('/{pedido_id}')
+def pedido_update(pedido_id: int, new_info: schemas.PedidoUpdate, db: Session = Depends(get_db), usuario_atual: dict = Depends(verificar_token_jwt)):
+    pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
+
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Não existe nenhum pedido com o id informado.")
+    
+    id_atual = db.query(models.Usuario).filter(models.Usuario.email == usuario_atual['email']).first().id
+
+    if pedido.cliente_id != id_atual and usuario_atual['cargo'] not in ['admin', 'funcionario']:
+        raise HTTPException(status_code=403, detail="O pedido não está associado à sua conta.")
+
+    if usuario_atual['cargo'] not in ['admin', 'funcionario'] and new_info.status == 'concluido':
+        raise HTTPException(status_code=403, detail="Você não possui permissão para marcar pedidos como concluídos.")
+
+    elif usuario_atual['cargo'] not in ['admin', 'funcionario'] and pedido.status == 'cancelado':
+        raise HTTPException(status_code=403, detail="Uma vez cancelado, o pedido não pode ser mais alterado. Contate o suporte.")
+
+    update = new_info.model_dump(exclude_unset=True)
+
+    for key, value in update.items():
+        setattr(pedido, key, value)
+
+    db.commit()
+    db.refresh(pedido)
+
+    return pedido

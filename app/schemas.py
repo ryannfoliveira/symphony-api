@@ -73,5 +73,10 @@ class ItemPedido(BaseModel):
     quantidade: int = Field(gt=0)
 
 class PedidoCreate(BaseModel):
-    usuario_id: int
+    #usuario_id: int
+    # Linha comentada pois agora o id será pego diretamente do token JWT
     produtos: List[ItemPedido]
+
+class PedidoUpdate(BaseModel):
+    status: Optional[str] = Field(default="pendente", pattern="^(pendente|concluido|cancelado)$")
+    produtos: Optional[List[ItemPedido]]
